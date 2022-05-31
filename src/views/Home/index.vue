@@ -1,86 +1,98 @@
 <template>
-<div>
- <div class="home">
-    <!-- 轮播图 -->
-    <div class="banner">
-      <el-carousel indicator-position="outside" height="480px">
-        <el-carousel-item v-for="(item,i) in banner" :key="i">
-          <img v-if="item.picUrl" class="img1" :src="item.picUrl" alt>
-          <img v-if="item.picUrl2" class="img2 a" :src="item.picUrl2" alt>
-          <img v-if="item.picUrl3" class="img3 b" :src="item.picUrl3" alt>
-        </el-carousel-item>
-      </el-carousel>
+  <div>
+    <div class="home">
+      <!-- 轮播图 -->
+      <div class="banner">
+        <el-carousel indicator-position="outside" height="480px">
+          <el-carousel-item v-for="(item, i) in banner" :key="i">
+            <img v-if="item.picUrl" class="img1" :src="item.picUrl" alt />
+            <img v-if="item.picUrl2" class="img2 a" :src="item.picUrl2" alt />
+            <img v-if="item.picUrl3" class="img3 b" :src="item.picUrl3" alt />
+          </el-carousel-item>
+        </el-carousel>
+      </div>
     </div>
-  </div>
-  <div v-for="item in homeList" :key="item.id">
-      <div class="activity-panel" v-if="item.type===1">
+    <div v-for="item in homeList" :key="item.id">
+      <div class="activity-panel" v-if="item.type === 1">
         <!-- 仅仅要活动版块的内容 -->
         <el-row>
-          <el-col class="content" :span="8" v-for="o in item.panelContents" :key="o.id">
+          <el-col
+            class="content"
+            :span="8"
+            v-for="o in item.panelContents"
+            :key="o.id"
+          >
             <el-card :body-style="{ padding: '0px' }">
-              <img :src="o.picUrl" class="i">
+              <img :src="o.picUrl" class="i" />
               <a href="#" class="cover-link"></a>
             </el-card>
           </el-col>
         </el-row>
       </div>
-    <section class="w mt30 clearfix" v-if='item.type===2'>
-        <m-shelf :title='item.name'>
-          <div slot='content' class="hot">
-            <mall-goods v-for="(o,i) in item.panelContents" :key="i" :goods="o"></mall-goods>
+      <section class="w mt30 clearfix" v-if="item.type === 2">
+        <m-shelf :title="item.name">
+          <div slot="content" class="hot">
+            <mall-goods
+              v-for="(o, i) in item.panelContents"
+              :key="i"
+              :goods="o"
+            ></mall-goods>
           </div>
         </m-shelf>
       </section>
-          <section class="w mt30 clearfix" v-if='item.type===3'>
-                <m-shelf :title="item.name">
+      <section class="w mt30 clearfix" v-if="item.type === 3">
+        <m-shelf :title="item.name">
           <div slot="content" class="floors">
             <div
               class="imgbanner"
-              v-for="(o,j) in item.panelContents"
+              v-for="(o, j) in item.panelContents"
               :key="j"
-              v-if="o.type===2 || o.type===3"
+              v-if="o.type === 2 || o.type === 3"
             >
-            <img :src="o.picUrl" alt="">
+              <img :src="o.picUrl" alt="" />
             </div>
-            <mall-goods :goods='o' v-for='(o,i) in item.panelContents' :key='i' v-if='o.type===0'></mall-goods>
+            <mall-goods
+              :goods="o"
+              v-for="(o, i) in item.panelContents"
+              :key="i"
+              v-if="o.type === 0"
+            ></mall-goods>
           </div>
-      
-          
         </m-shelf>
       </section>
-  </div>
+    </div>
   </div>
 </template>
 
 <script>
-import MallGoods from '@/components/MallGoods'
+import MallGoods from "@/components/MallGoods";
 import MShelf from "@/components/Shelf.vue";
-  export default {
-    data(){
-      return{
-        banner:[],
-        homeList:[]
-      };
-    },
-    components: {
-      MShelf,
-      MallGoods
-    },
-    async created(){
-      try {
-        const res =await this.$http.get('/api/goods/home');
-        let data = res.data;
-        if (data.code===200){
-          let result = data.result;
-          this.homeList=result;
-          let item = result.find(item=>item.type ===0);
-          this.banner=item.panelContents
-        }
-      } catch (error) {
-        console.log(error.message)
+export default {
+  data() {
+    return {
+      banner: [],
+      homeList: [],
+    };
+  },
+  components: {
+    MShelf,
+    MallGoods,
+  },
+  async created() {
+    try {
+      const res = await this.$http.get("/api/goods/home");
+      let data = res.data;
+      if (data.code === 200) {
+        let result = data.result;
+        this.homeList = result;
+        let item = result.find((item) => item.type === 0);
+        this.banner = item.panelContents;
       }
-    } 
-  }
+    } catch (error) {
+      console.log(error.message);
+    }
+  },
+};
 </script>
 
 <style lang="scss" scoped>

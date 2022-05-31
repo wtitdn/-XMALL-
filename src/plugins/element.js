@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { Button, Input,Form,FormItem, Breadcrumb, BreadcrumbItem, Pagination,Carousel, CarouselItem,Row,Col,Card,InputNumber,Table,TableColumn} from 'element-ui'
+import { Button, Input,Form,FormItem, Breadcrumb, BreadcrumbItem, Pagination,Carousel, CarouselItem,Row,Col,Card,InputNumber,Table,TableColumn,Image,Calendar,MessageBox,Popconfirm, Empty, Menu,Submenu,MenuItem,Icon} from 'element-ui'
 
 Vue.use(Button)
 Vue.use(Input)
@@ -16,3 +16,12 @@ Vue.use(Form)
 Vue.use(FormItem)
 Vue.use(Table)
 Vue.use(TableColumn)
+Vue.use(Image)
+Vue.use(Calendar)
+Vue.use(Popconfirm)
+Vue.use(Empty)
+Vue.use(Menu)
+Vue.use(Submenu)
+Vue.use(MenuItem)
+Vue.use(Icon)
+Vue.prototype.$mb = MessageBox

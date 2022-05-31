@@ -39,6 +39,7 @@ export default {
   computed: {
     ...mapState(["login"])
   },
+  
   methods: {
     ...mapMutations(['ADDCART']),
     productDetail(id) {
@@ -63,7 +64,8 @@ export default {
           productId:id,
           salePrice:price,
           productName:name,
-          productImageBig:img
+          productImageBig:img,
+          productNum:1
         })
 
       }else{
@@ -72,7 +74,8 @@ export default {
           productId:id,
           salePrice:price,
           productName:name,
-          productImageBig:img
+          productImageBig:img,
+          productNum:1
         })
       }
     }

@@ -39,8 +39,8 @@
           <buy-num @handleValue="handleVal"></buy-num>
         </div>
         <div class="buy">
-          <el-button type="primary" @click='addCart()'>加入购物车</el-button>
-          <el-button type="danger">现在购买</el-button>
+          <el-button type="primary" @click='addCart(product.id, product.salePrice, product.productName, product.productImageBig,num)'>加入购物车</el-button>
+          <el-button type="danger" @click="goToCart(product.id, product.salePrice, product.productName, product.productImageBig,num)" >现在购买</el-button> 
         </div>
       </div>
     </div>
@@ -62,37 +62,89 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from "vuex";
+import { removeStore, getStore, setStore } from "@/utils/storage";
 import BuyNum from "@/components/BuyNum";
 import MShelf from "@/components/Shelf";
+
 export default {
   data() {
     return {
-      product: {},
-      small: [],
-      big: ""
+      product: {id:""},
+      small: [],//小图的url存储
+      big: "",//大图url
+      num:1//商品数目，默认为1
     };
   },
   components: {
     BuyNum,
     MShelf
   },
+  computed:{
+...mapState(["login"])
+  }
+  ,
   methods: {
-    //   加入购物车的操作
-    addCart(){
+    ...mapMutations(['ADDCART','INITBUYCART']),
 
+    //立即购买跳转
+    goToCart(id, price, name, img,num){
+      this.addCart(id, price, name, img,num);
+      this.$router.push("/cart");
     },
+
+    //   加入购物车的操作
+    addCart(id, price, name, img,num) {
+      console.log(this.num);
+      console.log(num);
+      console.log(id, price, name, img);
+      if (this.login) {
+        // 用户已登录
+        this.$http.post("/api/addCart", {
+          userId: getStore("id"),
+          productId:id,
+          productNum:num
+        });
+        // 已经存储到后端中， 将当前的商品存储到store的cartList
+        this.ADDCART({
+          productId:id,
+          salePrice:price,
+          productName:name,
+          productImageBig:img,
+          productNum:num
+        })
+
+      }else{
+        // 如果用户未登录 也要将商品存储到store的cartList
+        this.ADDCART({
+          productId:id,
+          salePrice:price,
+          productName:name,
+          productImageBig:img,
+          productNum:num
+        })
+      }
+    },
+
+    //处理num动态变化
     handleVal(num) {
-        console.log(num);
+        this.num=num;
     },
+    
+    //点击小图切换大图
     handleClick(src) {
       this.big = src;
     },
+
+    //异步请求商品细节，
     async getGoodsDetail() {
       try {
         const res = await this.$http.get(
           `/api/goods/productDet?productId=${this.$route.query.productId}`
         );
         this.product = res.data;
+        console.log(this.product);
+        this.product.id=this.$route.query.productId,
         this.small = this.product.productImageSmall;
         this.big = this.small[0];
       } catch (error) {

@@ -18,6 +18,11 @@
       </div>
     </div>
     <div>
+      <div v-if="allGoods.length===0" >
+        <el-card style="width:78%;margin:auto;border-radius: 60px">
+          <el-empty></el-empty>
+        </el-card>
+      </div>
       <div class="goods-box w">
         <mall-goods v-for="goods in allGoods" :key="goods.id" :goods="goods"></mall-goods>
       </div>
@@ -27,7 +32,7 @@
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page.sync="currentPage"
-          :page-sizes="[8, 20, 40, 80]"
+          :page-sizes="[8, 12, 20, 80]"
           :page-size="pageSize"
           layout="total,sizes, prev, pager, next"
           :total="total"
@@ -73,7 +78,7 @@ export default {
     },
     handleCurrentChange(val) {
       this.currentPage = val;
-      this.getAllGoods();
+      this.getAllGoods1();
     },
     async getAllGoods() {
         const url = this.$route.query.cid ? `/api/goods/allGoods?page=${this.currentPage}&size=${
@@ -88,6 +93,22 @@ export default {
 
         this.allGoods = res.data.data;
         this.total = res.data.total;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getAllGoods1() {
+        const url = this.$route.query.cid ? `/api/goods/allGoods?page=${this.currentPage}&size=${
+            this.pageSize
+          }&sort=${this.sort}&priceGt=${this.min}&priceLte=${this.max}&cid=${this.$route.query.cid}`: `/api/goods/allGoods?page=${this.currentPage}&size=${
+            this.pageSize
+          }&sort=${this.sort}&priceGt=${this.min}&priceLte=${this.max}`
+      try {
+        const res = await this.$http.get(
+          url
+        );
+
+        this.allGoods = res.data.data;
       } catch (error) {
         console.log(error);
       }
@@ -155,6 +176,7 @@ export default {
     }
     input + input {
       margin-left: 10px;
+      
     }
   }
   .price-interval {
@@ -165,6 +187,7 @@ export default {
       text-align: center;
       background: none;
       border-radius: 5px;
+      
     }
   }
 }

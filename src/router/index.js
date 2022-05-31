@@ -15,6 +15,7 @@ const GoodsDetail = () => import('@/views/GoodsDetail');
 const User = () => import('@/views/User');
 const Register = () => import('@/views/Register');
 const Cart = () => import('@/views/Cart');
+const Orderlist = () => import('@/views/Order');
 Vue.use(VueRouter)
 
 const routes = [
@@ -40,7 +41,8 @@ const routes = [
         path: 'goodsDetail',
         name: 'goodsDetail',
         component: GoodsDetail
-      }
+      },
+      
     ]
     },
     {
@@ -55,19 +57,49 @@ const routes = [
       component: Register
     },
     {
-      path:'/Cart',
-      name:'Cart',
-      component: Cart
-    },
-    {
       path:'/user',
       name:'user',
+      redirect: '/user/Orderlist',
       component:User,
+
+      
       meta:{
         // 需要守卫
         auth:true
-      }
-    }
+      },
+      children:[
+        {
+          path:'/Cart',
+          name:'Cart',
+          component: Cart,
+          meta:{
+            // 需要守卫
+            auth:true
+          }
+        },
+        {
+          path:'/user/Orderlist',
+          name:'orderlist',
+          component:Orderlist,
+          meta:{
+            // 需要守卫
+            auth:true
+          },
+        
+        },
+        {
+          path:'/user/Orderlist',
+          name:'orderlist',
+          component:Orderlist,
+          meta:{
+            // 需要守卫
+            auth:true
+          },
+        
+        }
+      ]
+    },
+    
 ]
 
 const router = new VueRouter({

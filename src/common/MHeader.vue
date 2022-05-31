@@ -1,6 +1,5 @@
 <template>
   <div class="header-box">
-    <!-- mjj1015481875 -->
     <div>
       <header class="w">
         <div class="w-box">
@@ -11,17 +10,25 @@
           </div>
           <div class="right-box">
             <div class="nav-list">
-              <el-input
+               <el-input
                 placeholder="请输入商品信息"
-                suffix-icon="el-icon-search"
                 v-model="productInfo"
                 minlength="1"
                 maxlength="100"
-              ></el-input>
+                @keyup.enter.native="search(productInfo)"
+              >
+              <i slot="suffix" class="el-icon-search" @click="search(productInfo)" style="line-height:40px;cursor: pointer;margin-right: 8px;"></i></el-input> 
+              <!-- <el-autocomplete
+                class="inline-input"
+                v-model="productInfo"
+                :fetch-suggestions="querySearch"
+                placeholder="请输入内容"
+                :trigger-on-focus="false"
+                @select="handleSelect"
+              ></el-autocomplete> -->
               <router-link to="/goods">全部商品</router-link>
               <router-link to="/thanks">捐赠</router-link>
             </div>
-
             <div class="nav-aside">
               <!-- 用户 -->
               <div class="user pr">
@@ -32,18 +39,27 @@
                       <!-- 头像 -->
                       <li class="nav-user-avatar">
                         <div>
-                          <span class="avatar" :style="{backgroundImage:'url('+userInfo.file+')'}"></span>
+                          <span
+                            class="avatar"
+                            :style="{
+                              backgroundImage: 'url(' + userInfo.file + ')',
+                            }"
+                          ></span>
                         </div>
-                        <p class="name">{{userInfo.username}}</p>
+                        <p class="name">{{ userInfo.username }}</p>
                       </li>
                       <li>
                         <router-link to="/user/orderList">我的订单</router-link>
                       </li>
                       <li>
-                        <router-link to="/user/information">账号资料</router-link>
+                        <router-link to="/user/information"
+                          >账号资料</router-link
+                        >
                       </li>
                       <li>
-                        <router-link to="/user/addressList">收货地址</router-link>
+                        <router-link to="/user/addressList"
+                          >收货地址</router-link
+                        >
                       </li>
                       <li>
                         <router-link to="/user/support">售后服务</router-link>
@@ -67,7 +83,9 @@
               >
                 <router-link to="/cart"></router-link>
                 <span class="cart-num">
-                  <i class="num" :class="{no:totalNum == 0}">{{totalNum}}</i>
+                  <i class="num" :class="{ no: totalNum == 0 }">{{
+                    totalNum
+                  }}</i>
                 </span>
 
                 <!-- 购物车显示 -->
@@ -76,28 +94,41 @@
                     <div class="full">
                       <div class="nav-cart-items">
                         <ul>
-                          <li class="clearfix" v-for="(goods,index) in cartList" :key="index">
+                          <li
+                            class="clearfix"
+                            v-for="(goods, index) in cartList"
+                            :key="index"
+                          >
                             <div class="cart-item">
                               <div class="cart-item-inner">
-                                <a>
+                                <div>
                                   <div class="item-thumb">
-                                    <img :src="goods.productImageBig">
+                                    <img :src="goods.productImageBig" />
                                   </div>
                                   <div class="item-desc">
                                     <div class="cart-cell">
                                       <h4>
-                                        <a href>{{goods.productName}}</a>
+                                        <a>{{ goods.productName }}</a>
                                       </h4>
                                       <!-- <p class="attrs"><span>白色</span></p> -->
                                       <h6>
                                         <span class="price-icon">¥</span>
-                                        <span class="price-num">{{goods.salePrice}}</span>
-                                        <span class="item-num">x {{goods.productNum}}</span>
+                                        <span class="price-num">{{
+                                          Number(goods.salePrice).toFixed(2)
+                                        }}</span>
+                                        <span class="item-num"
+                                          >x {{ goods.productNum }}</span
+                                        >
                                       </h6>
                                     </div>
                                   </div>
-                                </a>
-                                <div class="del-btn del">删除</div>
+                                </div>
+                                <div
+                                  class="del-btn del"
+                                  @click="removeItem(index)"
+                                >
+                                  删除
+                                </div>
                               </div>
                             </div>
                           </li>
@@ -107,19 +138,30 @@
                       <div class="nav-cart-total">
                         <p>
                           共
-                          <strong>{{totalNum}}</strong> 件商品
+                          <strong>{{ totalNum }}</strong> 件商品
                         </p>
                         <h5>
                           合计：
                           <span class="price-icon">¥</span>
-                          <span class="price-num">{{totalPrice}}</span>
+                          <span class="price-num">{{
+                            Number(totalPrice).toFixed(2)
+                          }}</span>
                         </h5>
                         <h6>
-                          <el-button type="danger">去购物车</el-button>
+                          <div>
+                            <router-link to="/cart"></router-link>
+                            <el-button type="danger" @click="goToCart"
+                              >去购物车</el-button
+                            >
+                          </div>
                         </h6>
                       </div>
                     </div>
-                    <div style="height: 313px;text-align: center" class="cart-con" v-if='!totalNum'>
+                    <div
+                      style="height: 313px; text-align: center"
+                      class="cart-con"
+                      v-if="!totalNum"
+                    >
                       <p>您的购物车竟然是空的!</p>
                     </div>
                   </div>
@@ -134,11 +176,16 @@
           <div class="nav-sub-bg"></div>
           <div class="nav-sub-wrapper">
             <div class="w">
-              <el-breadcrumb separator-class="el-icon-arrow-right">
-                <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                <el-breadcrumb-item :to="{path:'/goods'}">全部</el-breadcrumb-item>
-                <el-breadcrumb-item :to="{path:'/goods?cid=1184'}">品牌周边</el-breadcrumb-item>
-                <el-breadcrumb-item :to="{path:'/thanks'}">捐赠名单</el-breadcrumb-item>
+              <el-breadcrumb separator="/">
+                <el-breadcrumb-item :to="{ path: '/' }"
+                  >首页</el-breadcrumb-item
+                >
+                <el-breadcrumb-item :to="{ path: '/goods' }"
+                  >全部</el-breadcrumb-item
+                >
+                <el-breadcrumb-item :to="{ path: '/goods?cid=1184' } " class="brand"
+                  >品牌周边</el-breadcrumb-item
+                >
               </el-breadcrumb>
             </div>
           </div>
@@ -155,11 +202,12 @@ import { removeStore, getStore, setStore } from "@/utils/storage";
 export default {
   data() {
     return {
-      productInfo: ""
+      productInfo: "",
     };
   },
   computed: {
     ...mapState(["login", "userInfo", "cartList", "showCart"]),
+    //购物车计算总数目
     totalNum() {
       return (
         this.cartList &&
@@ -169,7 +217,8 @@ export default {
         }, 0)
       );
     },
-    totalPrice(){
+//购物车计算总价
+    totalPrice() {
       return (
         this.cartList &&
         this.cartList.reduce((total, item) => {
@@ -177,13 +226,16 @@ export default {
           return total;
         }, 0)
       );
-    }
+    },
   },
   async mounted() {
     if (this.login) {
-      const res = await this.$http.post("/api/cartList", { userId: getStore("id") });
+      const res = await this.$http.post("/api/cartList", {
+        userId: getStore("id"),
+      });
       if (res.data.success === true) {
         setStore("buyCart", res.data.cartList.cartList);
+        console.log(res.data.cartList.cartList);
         this.INITBUYCART();
       }
     } else {
@@ -191,25 +243,57 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["SHOWCART", "INITBUYCART"]),
+    ...mapMutations(["SHOWCART", "INITBUYCART", "DELETEGOOD"]),
+    search(val) {
+      this.$router.push({
+        name: "goods",
+        query: {
+          productId: id,
+        },
+      });
+    },
+    goToCart() {
+      this.$router.push("/cart");
+    },
     cartShowState(state) {
       this.SHOWCART({
-        showCart: state
+        showCart: state,
       });
+    },
+    search(productInfo) {
+      this.$router.push({
+        path: "/goods",
+        query: {
+          cid: productInfo,
+        },
+      });
+    },
+    removeItem(index) {
+      console.log(index);
+      console.log(this.cartList);
+      this.DELETEGOOD(index);
+      this.$http.post("/api/deleteCart", {
+        index: index,
+        userId: getStore("id"),
+      });
+      console.log(this.cartList);
+      setStore("buyCart", this.cartList);
+      this.INITBUYCART();
     },
     logout() {
       removeStore("token");
       removeStore("buyCart");
       window.location.href = "/";
-    }
+    },
   },
-  created() {}
+  created() {},
 };
 </script>
 
 <style lang="scss" scoped>
 @import "../assets/style/theme";
 @import "../assets/style/mixin";
+
 .w-box .nav-list .el-input {
   margin-right: 10px;
 }
@@ -225,7 +309,15 @@ header {
   z-index: 30;
   position: relative;
 }
-
+.el-breadcrumb ::v-deep .el-breadcrumb__inner {
+  font-weight: 700;
+  cursor: pointer;
+  color: #303133;
+  &:hover{
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
 .w-box {
   display: flex;
   justify-content: space-between;
